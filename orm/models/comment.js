@@ -1,5 +1,4 @@
 'use strict';
-const { de } = require('faker/lib/locales');
 const {
   Model
 } = require('sequelize');
