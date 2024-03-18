@@ -11,6 +11,7 @@ const ProductRoute = require('./routes/ProductRoute')
 const CartRoute = require('./routes/CartRoute')
 const CommentRoute = require('./routes/CommentRoute')
 const CategoryRoute = require('./routes/CategoryRoute')
+const OrderRoute = require('./routes/OrderRoute')
 const connection = require('./orm/configs/connectDB')
 
 //config server
@@ -35,3 +36,4 @@ app.use('/api/product',ProductRoute)
 app.use('/api/cart',CartRoute)
 app.use('/api/comment',CommentRoute)
 app.use('/api/category',CategoryRoute)
+app.use('/api/order',OrderRoute)
