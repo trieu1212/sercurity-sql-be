@@ -1,19 +1,13 @@
 {
   "development": {
-    "username": "qtrieu",
-    "password": "Trieu@121203",
+    "username": "root",
+    "password": null,
     "database": "baomat",
-    "host": "sercurity.mysql.database.azure.com",
+    "host": "127.0.0.1",
     "dialect": "mysql",
     "define":{
       "freezeTableName":true
-    },
-    "ssl": true,
-    "dialectOptions": {
-       "ssl": {
-          "require": true
-       }
-     }
+    }
   },
   "test": {
     "username": "root",

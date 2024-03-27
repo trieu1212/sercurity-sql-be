@@ -18,9 +18,11 @@ const ProductController = {
               "inStock",
               "categoryId",
             ],
+            include: [{ model: db.Category, attributes: ["id", "name"] }],
             limit: parseInt(limit),
             offset: offset,
             where: categoryId && { categoryId: parseInt(categoryId) },
+            order: [["id", "DESC"]],
           }
         )
         const data = {
@@ -40,8 +42,10 @@ const ProductController = {
             "inStock",
             "categoryId",
           ],
+          include: [{ model: db.Category, attributes: ["id", "name"] }],
           limit: limit ? parseInt(limit) : 10,
           where: categoryId && { categoryId: parseInt(categoryId) },
+          order: [["id", "DESC"]],
         });
         res.status(200).json(product);
       }
@@ -65,15 +69,42 @@ const ProductController = {
       res.status(500).json({ message: error.message });
     }
   },
-  // createProduct:async(req,res)=>{
-  //   const newProduct = new productModel(req.body);
-  //   try {
-  //     const product = await newProduct.save();
-  //     res.status(201).json(product);
-  //   } catch (err) {
-  //     res.status(500).json(err);
-  //   }
-  // }
+  createProduct: async(req,res)=>{
+    const {title,description,image,price,inStock,categoryId} = req.body
+    try {
+      const product = await db.Product.create({
+        title,
+        description,
+        image,
+        price,
+        inStock,
+        categoryId
+      })
+      res.status(201).json(product)
+    } catch (error) {
+      res.status(500).json({message:error.message})
+    }
+  },
+  deleteProduct: async(req,res)=>{
+    const {productId} = req.params
+    try {
+      await db.Product.destroy({
+        where:{id:productId}
+      })
+      res.status(200).json({message:'Xóa sản phẩm thành công'})
+    } catch (error) {
+      res.status(500).json({message:error.message})
+    }
+  },
+  getProductByIdAdmin: async(req,res)=>{
+    const {productId} = req.params
+    try {
+      const product = await db.Product.findByPk(productId)
+      res.status(200).json(product)
+    } catch (error) {
+      res.status(500).json({message:error.message})
+    }
+  },
 };
 
 module.exports = ProductController;

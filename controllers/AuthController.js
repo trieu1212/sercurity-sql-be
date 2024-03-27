@@ -1,8 +1,6 @@
-
-const bcrypt = require('bcryptjs');
-const db = require('../orm/models/index');
-const jwt = require('jsonwebtoken');
-let refreshTokens = [];
+const bcrypt = require("bcryptjs");
+const db = require("../orm/models/index");
+const jwt = require("jsonwebtoken");
 const AuthController = {
   generateAccessToken: (user) => {
     return jwt.sign(
@@ -11,7 +9,7 @@ const AuthController = {
         isAdmin: user.isAdmin,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "5m" }
+      { expiresIn: "2m" }
     );
   },
   generateRefreshToken: (user) => {
@@ -33,6 +31,7 @@ const AuthController = {
         username: username,
         email: email,
         password: hashPassword,
+        refreshToken: null,
       });
       res.status(200).json(newUser);
     } catch (error) {
@@ -50,13 +49,16 @@ const AuthController = {
       } else {
         const validPass = await bcrypt.compare(password, user.password);
         if (!validPass) {
-        return res.status(400).json({ message: "wrong password" });
+          return res.status(400).json({ message: "wrong password" });
         } else {
           const accessToken = AuthController.generateAccessToken(user);
           const refreshToken = AuthController.generateRefreshToken(user);
-          refreshTokens.push(refreshToken);
+          await db.User.update(
+            { refreshToken: refreshToken },
+            { where: { username: username } }
+          );
           const { password, ...info } = user.dataValues;
-          res.status(200).json({...info, accessToken, refreshToken});
+          res.status(200).json({ ...info, accessToken, refreshToken });
         }
       }
     } catch (error) {
@@ -64,36 +66,69 @@ const AuthController = {
     }
   },
   refresh: async (req, res) => {
-    const {refreshToken} = req.body;
+    const { refreshToken } = req.body;
     if (!refreshToken) {
       res.status(401).json({ message: "User not authenticated" });
     } else {
-      if (!refreshTokens.includes(refreshToken)) {
-        res.status(403).json({ message: "Refresh token not valid" });
-      } else {
-        jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, (err, user) => {
-          if (err) {
-            console.log(err);
-          } else {
-            refreshTokens = refreshTokens.filter(
-              (token) => token !== refreshToken
-            );
-            const newAccessToken = AuthController.generateAccessToken(user);
-            const newRefreshToken = AuthController.generateRefreshToken(user);
-            refreshTokens.push(newRefreshToken);
-            console.log(refreshTokens)
-            res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken});
-          }
+      try {
+        const user = await db.User.findOne({
+          where: { refreshToken: refreshToken },
         });
+        if (!user) {
+          res.status(403).json({ message: "Refresh token not valid" });
+        } else {
+          jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_KEY,
+            async (err, decoded) => {
+              if (err) {
+                console.log(err);
+              } else {
+                const newAccessToken =
+                  AuthController.generateAccessToken(decoded);
+                const newRefreshToken =
+                  AuthController.generateRefreshToken(decoded);
+                await db.User.update(
+                  { refreshToken: newRefreshToken },
+                  { where: { refreshToken: refreshToken } }
+                );
+                res.status(200).json({
+                  accessToken: newAccessToken,
+                  refreshToken: newRefreshToken,
+                });
+              }
+            }
+          );
+        }
+      } catch (error) {
+        res.status(500).json({ message: error.message });
       }
     }
   },
   logoutUser: async (req, res) => {
-    const {refreshToken} = req.body 
-    refreshTokens = refreshTokens.filter(
-      (token) => token !== refreshToken
-    );
-    res.status(200).json({ message: "User logged out" });
+    const { refreshToken } = req.body;
+    try {
+      if (!refreshToken) {
+        return res.status(400).json({ message: "Refresh token is required" });
+      }
+
+      const user = await db.User.findOne({
+        where: { refreshToken: refreshToken },
+      });
+
+      if (!user) {
+        return res.status(403).json({ message: "Refresh token not valid" });
+      }
+
+      await db.User.update(
+        { refreshToken: null },
+        { where: { refreshToken: refreshToken } }
+      );
+
+      return res.status(200).json({ message: "User logged out" });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
   },
 };
 

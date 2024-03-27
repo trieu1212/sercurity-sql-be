@@ -39,7 +39,7 @@ const OrderController = {
             include: [
               {
                 model: db.Product,
-                attributes: ["title", "price"],
+                attributes: ["id","title", "price", "image"],
               },
             ],
           },
@@ -51,6 +51,28 @@ const OrderController = {
       res.status(500).json({ message: error.message });
     }
   },
+  getAllOrder : async(req,res)=>{
+    try {
+      const order = await db.Order.findAll({
+        include: [
+          {
+            model: db.OrderItem,
+            include: [
+              {
+                model: db.Product,
+                attributes: ["id","title", "price", "image"],
+              },
+            ],
+          },
+          { model: db.User, attributes: ["username", "email"] },
+        ],
+        order: [['createdAt', 'DESC']]
+      })
+      res.status(200).json(order)
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
 };
 
 module.exports = OrderController;
