@@ -16,7 +16,7 @@ const connection = require('./orm/configs/connectDB')
 
 //config server
 const app = express()
-const PORT = process.env.PORT || 3306
+const PORT = process.env.PORT || 7000
 dotenv.config()
 app.use(bodyParser.json())
 app.use(cors())

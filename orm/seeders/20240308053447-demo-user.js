@@ -22,6 +22,8 @@ module.exports = {
           categoryId:3,
           price: 615000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Áo Nỉ Nữ Suông",
@@ -30,6 +32,8 @@ module.exports = {
           categoryId:2,
           price: 300000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Áo Thun Dài Tay Nam",
@@ -38,6 +42,8 @@ module.exports = {
           categoryId:1,
           price: 185000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Quần Tây Dài Nam",
@@ -46,6 +52,8 @@ module.exports = {
           categoryId:3,
           price: 680000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Quần Dài Nữ",
@@ -54,6 +62,8 @@ module.exports = {
           categoryId:4,
           price: 513000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Quần Tây Dài Nữ",
@@ -62,6 +72,8 @@ module.exports = {
           categoryId:4,
           price: 342000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Áo Khoác 1 Lớp Nữ",
@@ -70,6 +82,8 @@ module.exports = {
           categoryId:2,
           price: 2022000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Áo Khoác 1 Lớp Nam",
@@ -78,6 +92,8 @@ module.exports = {
           categoryId:1,
           price: 1800000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Quần Sooc Nữ",
@@ -86,6 +102,8 @@ module.exports = {
           categoryId:4,
           price: 100000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           title: "Quần Ngố Nam",
@@ -94,6 +112,8 @@ module.exports = {
           categoryId:3,
           price: 143000,
           inStock: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
       {}

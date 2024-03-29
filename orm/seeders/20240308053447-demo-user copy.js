@@ -18,18 +18,26 @@ module.exports = {
         {
           name:"Áo - Nam",
           description:"Áo Nam",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name:"Áo - Nữ",
           description:"Áo Nữ",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name:"Quần - Nam",
           description:"Quần Nam",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name:"Quần - Nữ",
           description:"Quần Nữ",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
       {}
