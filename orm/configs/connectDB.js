@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const sequelize = new Sequelize(process.env.DATABASE||"bnfboiqzp7twcteh0dhx", "uspmzm0ptrbese3z" ,process.env.PASSWORD||"KF4x4zCvcm8rMWAU4uGR", {
     host: process.env.HOST,
+    port:3306,
     dialect:  'mysql' 
 });
 
