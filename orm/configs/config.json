@@ -10,17 +10,23 @@
     }
   },
   "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "uspmzm0ptrbese3z",
+    "password": "KF4x4zCvcm8rMWAU4uGR",
+    "database": "bnfboiqzp7twcteh0dhx",
+    "host": "bnfboiqzp7twcteh0dhx-mysql.services.clever-cloud.com",
+    "dialect": "mysql",
+    "define":{
+      "freezeTableName":true
+    }
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "uspmzm0ptrbese3z",
+    "password": "KF4x4zCvcm8rMWAU4uGR",
+    "database": "bnfboiqzp7twcteh0dhx",
+    "host": "bnfboiqzp7twcteh0dhx-mysql.services.clever-cloud.com",
+    "dialect": "mysql",
+    "define":{
+      "freezeTableName":true
+    }
   }
 }
