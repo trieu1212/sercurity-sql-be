@@ -1,9 +1,11 @@
 const db = require("../orm/models/index");
 const ProductController = {
   getAllProduct: async (req, res) => {
-    const limit = req.query.limit;
+    const limit = req.query.limit||10;
     const categoryId = req.query.categoryId;
-    const page = req.query.page;
+    const page = req.query.page||1;
+    const sort = req.query.sort || 'DESC'
+    console.log(sort)
     try {
       if (limit && page) {
         let offset = (parseInt(page) - 1) * parseInt(limit);
@@ -22,7 +24,7 @@ const ProductController = {
             limit: parseInt(limit),
             offset: offset,
             where: categoryId && { categoryId: parseInt(categoryId) },
-            order: [["id", "DESC"]],
+            order: sort==='DESC'? [["price", "DESC"]] :[["price", "ASC"]],
           }
         )
         const data = {
@@ -45,7 +47,7 @@ const ProductController = {
           include: [{ model: db.Category, attributes: ["id", "name"] }],
           limit: limit ? parseInt(limit) : 10,
           where: categoryId && { categoryId: parseInt(categoryId) },
-          order: [["id", "DESC"]],
+          order: !sort===true? [["price", "DESC"]] :[["price", "ASC"]],
         });
         res.status(200).json(product);
       }

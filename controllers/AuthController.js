@@ -1,6 +1,8 @@
 const bcrypt = require("bcryptjs");
 const db = require("../orm/models/index");
 const jwt = require("jsonwebtoken");
+const { QueryTypes } = require("sequelize");
+//sequelize raw queries
 const AuthController = {
   generateAccessToken: (user) => {
     return jwt.sign(
@@ -9,7 +11,7 @@ const AuthController = {
         isAdmin: user.isAdmin,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "2m" }
+      { expiresIn: "5m" }
     );
   },
   generateRefreshToken: (user) => {
@@ -23,7 +25,8 @@ const AuthController = {
     );
   },
   registerUser: async (req, res) => {
-    const { username, password, email } = req.body;
+    const { username, password, email, phone, address } = req.body;
+    console.log('register', req.body);
     try {
       const salt = bcrypt.genSaltSync(10);
       const hashPassword = bcrypt.hashSync(password, salt);
@@ -31,6 +34,8 @@ const AuthController = {
         username: username,
         email: email,
         password: hashPassword,
+        phone: phone,
+        address: address,
         refreshToken: null,
       });
       res.status(200).json(newUser);
@@ -38,6 +43,7 @@ const AuthController = {
       res.status(500).json({ message: error.message });
     }
   },
+  //login using ORM
   loginUser: async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -57,18 +63,68 @@ const AuthController = {
             { refreshToken: refreshToken },
             { where: { username: username } }
           );
-          const { password, ...info } = user.dataValues;
-          res.status(200).json({ ...info, accessToken, refreshToken });
+          res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: true
+          });
+          const userData = await db.User.findOne({
+            where: { username: username },
+            attributes: ['id', 'username', 'email','phone','address','isAdmin']
+          });
+          res.status(200).json({ userData, accessToken });
         }
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   },
-  refresh: async (req, res) => {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-      res.status(401).json({ message: "User not authenticated" });
+
+  //login using raw queries 
+  // username: ' OR '1'='1
+  // password: ' OR '1'='1
+
+  // loginUser: async (req, res) => {
+  //   const { username, password } = req.body;
+  //   try {
+  //     const query = `
+  //       SELECT * FROM user
+  //       WHERE username = '${username}' AND password = '${password}'
+  //       LIMIT 1
+  //     `;
+  //     const [user] = await db.sequelize.query(query, {
+  //       type: QueryTypes.SELECT,
+  //     });
+
+  //     if (!user) {
+  //       return res.status(400).json({ message: "User not found" });
+  //     }
+
+  //     const accessToken = AuthController.generateAccessToken(user);
+  //     const refreshToken = AuthController.generateRefreshToken(user);
+
+  //     await db.User.update(
+  //       { refreshToken: refreshToken },
+  //       { where: { username: user.username } }
+  //     );
+  //     res.cookie("refreshToken", refreshToken, {
+  //       httpOnly: true,
+  //       sameSite: 'strict',
+  //       secure: true
+  //     });
+  //     const userData = user
+  //     res.status(200).json({ userData, accessToken });
+  //   } catch (error) {
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
+
+  refresh: async (req, res) => { 
+    const cookie = req.cookies;
+    const refreshToken = req.cookies.refreshToken;
+    console.log('cookie', refreshToken);
+    if (!cookie && refreshToken) {
+      throw new Error('Không tìm thấy refresh token')
     } else {
       try {
         const user = await db.User.findOne({
@@ -83,6 +139,7 @@ const AuthController = {
             async (err, decoded) => {
               if (err) {
                 console.log(err);
+                throw new Error('Refresh token không hợp lệ')
               } else {
                 const newAccessToken =
                   AuthController.generateAccessToken(decoded);
@@ -92,9 +149,13 @@ const AuthController = {
                   { refreshToken: newRefreshToken },
                   { where: { refreshToken: refreshToken } }
                 );
+                res.cookie("refreshToken", newRefreshToken, {
+                  httpOnly: true,
+                  sameSite: 'strict',
+                  secure: true
+                })
                 res.status(200).json({
                   accessToken: newAccessToken,
-                  refreshToken: newRefreshToken,
                 });
               }
             }
@@ -105,31 +166,65 @@ const AuthController = {
       }
     }
   },
-  logoutUser: async (req, res) => {
-    const { refreshToken } = req.body;
+  getCurrent: async (req, res) => {
+    const { id } = req.user;
+    console.log('user id token', id);
     try {
-      if (!refreshToken) {
-        return res.status(400).json({ message: "Refresh token is required" });
-      }
-
       const user = await db.User.findOne({
-        where: { refreshToken: refreshToken },
+        where: { id: id },
+        include: [{
+          model: db.Cart,
+          include: [
+            { model: db.Product }
+          ]
+        }, db.Comment],
+        attributes: ['id', 'username', 'email', 'isAdmin', 'phone', 'address']
       });
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  logoutUser: async (req, res) => {
+    // const { refreshToken } = req.body;
+    // try {
+    //   if (!refreshToken) {
+    //     return res.status(400).json({ message: "Refresh token is required" });
+    //   }
 
-      if (!user) {
-        return res.status(403).json({ message: "Refresh token not valid" });
+    //   const user = await db.User.findOne({
+    //     where: { refreshToken: refreshToken },
+    //   });
+
+    //   if (!user) {
+    //     return res.status(403).json({ message: "Refresh token not valid" });
+    //   }
+
+    //   await db.User.update(
+    //     { refreshToken: null },
+    //     { where: { refreshToken: refreshToken } }
+    //   );
+    try {
+      const cookie = req.cookies;
+      const refreshToken = req.cookies.refreshToken;
+      if (!cookie || cookie.refreshToken === undefined) {
+        throw new Error('Không tìm thấy refresh token');
+      } else {
+        await db.User.update(
+          { refreshToken: null },
+          { where: { refreshToken: cookie.refreshToken } }
+        );
+        res.clearCookie('refreshToken', {
+          httpOnly: true,
+          sameSite: 'strict',
+          secure: true
+        });
+        return res.status(200).json({ message: "Đã đăng xuất" });
       }
-
-      await db.User.update(
-        { refreshToken: null },
-        { where: { refreshToken: refreshToken } }
-      );
-
-      return res.status(200).json({ message: "User logged out" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
-  },
+  }
 };
 
 module.exports = AuthController;

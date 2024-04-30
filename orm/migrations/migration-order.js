@@ -21,7 +21,7 @@ module.exports = {
         defaultValue:"pending"
       },
       address:{
-        type: Sequelize.JSON
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

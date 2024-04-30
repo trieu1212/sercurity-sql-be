@@ -42,14 +42,16 @@ const UserController = {
     }
   },
   updateUser: async (req, res) => {
-    const id = req.params.id;
-    const { username, email,isAdmin } = req.body;
+    const id = req.params.userId;
+    const { username, email,isAdmin,phone,address } = req.body;
     try {
       await db.User.update(
         {
           username: username,
           email: email,
-          isAdmin: isAdmin
+          isAdmin: isAdmin,
+          phone: phone,
+          address: address
         },
         {
           where: { id: id },
@@ -61,10 +63,12 @@ const UserController = {
     }
   },
   getOneUser: async (req, res) => {
-    const id = req.params.id;
+    const userId = req.params.userId;
+    console.log(userId);
     try {
       const user = await db.User.findOne({
-        where: { id: id },
+        where: { id: userId },
+        include:[db.Cart,db.Comment]
       });
       res.status(200).json(user);
     } catch (error) {

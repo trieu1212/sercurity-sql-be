@@ -1,10 +1,8 @@
 const {Sequelize} = require('sequelize');
 
-const dotenv = require('dotenv');
-dotenv.config();
-const sequelize = new Sequelize(process.env.DATABASE||"bnfboiqzp7twcteh0dhx", "uspmzm0ptrbese3z" ,process.env.PASSWORD||"KF4x4zCvcm8rMWAU4uGR", {
-    host: process.env.HOST,
-    port:3306,
+
+const sequelize = new Sequelize('bnfboiqzp7twcteh0dhx', "uspmzm0ptrbese3z" ,'KF4x4zCvcm8rMWAU4uGR', {
+    host: 'bnfboiqzp7twcteh0dhx-mysql.services.clever-cloud.com',
     dialect:  'mysql' 
 });
 

@@ -10,7 +10,7 @@ const OrderController = {
       const order = await db.Order.create({
         userId: userId,
         amount: amount,
-        status: "pending",
+        status: "Success",
         address: address,
       });
       if (products && products.length > 0) {
@@ -43,7 +43,7 @@ const OrderController = {
               },
             ],
           },
-          { model: db.User, attributes: ["username", "email"] },
+          { model: db.User, attributes: ["username", "email","phone","address"] },
         ],
       });
       res.status(200).json(order);
