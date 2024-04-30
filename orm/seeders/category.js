@@ -17,19 +17,27 @@ module.exports = {
       [
         {
           name:"Áo - Nam",
-          description:"Áo nam chất lượng cao"
+          description:"Áo nam chất lượng cao",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name:"Áo - Nữ",
-          description:"Áo nữ chất lượng cao"
+          description:"Áo nữ chất lượng cao",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name:"Quần - Nam",
-          description:"Quần nam chất lượng cao"
+          description:"Quần nam chất lượng cao",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
           name:"Quần - Nữ",
-          description:"Quần nữ chất lượng cao"
+          description:"Quần nữ chất lượng cao",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
       ],
       {}
