@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 7000
 dotenv.config()
 app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ 
+app.use(cors({  
     origin: true, 
     credentials: true 
   }));
@@ -32,7 +32,7 @@ connection()
 app.listen(PORT, (req,res)=>{
     console.log(`server đang chạy trên port: ${PORT}`)
 })
-
+ 
 //routes
 app.use('/api/auth',AuthRoute)  
 app.use('/api/user',UserRoute)

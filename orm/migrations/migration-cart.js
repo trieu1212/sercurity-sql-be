@@ -19,6 +19,11 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue:0
       },
+      size: {
+        type: Sequelize.ENUM('S', 'M', 'L', 'XL', 'XXL'),
+        defaultValue: 'M',
+        allowNull: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

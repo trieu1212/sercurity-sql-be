@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     orderId: DataTypes.INTEGER,
     productId: DataTypes.INTEGER,
     quantity: DataTypes.INTEGER,
+    size: DataTypes.ENUM('S', 'M', 'L', 'XL', 'XXL')
   }, {
     sequelize,
     modelName: 'OrderItem',

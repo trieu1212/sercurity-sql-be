@@ -8,6 +8,7 @@ router.get('/all/:userId',MiddlewareController.verifyTokenAndAdminAuth,UserContr
 router.delete('/delete/:id',MiddlewareController.verifyTokenAndAdminAuth,UserController.deleteUser)
 router.put('/update/:userId',MiddlewareController.verifyTokenAndAuthorize,UserController.updateUser)
 router.get('/:userId',MiddlewareController.verifyTokenAndAuthorize,UserController.getOneUser)
+router.put('/forgot-password',UserController.resetPassword)
 
 
 module.exports = router;

@@ -6,5 +6,5 @@ const router = express.Router();
 router.post('/create/:userId',MiddlewareController.verifyTokenAndAuthorize,CartController.createCart)
 router.get('/:userId',MiddlewareController.verifyTokenAndAuthorize,CartController.getUserCart)
 router.put('/update/:userId',MiddlewareController.verifyTokenAndAuthorize,CartController.updateUserCart)
-router.delete('/delete/:productId/:userId',MiddlewareController.verifyTokenAndAuthorize,CartController.deleteProductFromCart)
+router.delete('/delete/:productId/:size/:userId',MiddlewareController.verifyTokenAndAuthorize,CartController.deleteProductFromCart)
 module.exports = router;

@@ -19,6 +19,7 @@ const OrderController = {
             orderId: order.id,
             productId: product.productId,
             quantity: product.quantity,
+            size: product.size,
           });
         }
       }

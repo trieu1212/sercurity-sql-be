@@ -1,17 +1,20 @@
 const bcrypt = require("bcryptjs");
 const db = require("../orm/models/index");
 const jwt = require("jsonwebtoken");
-const { QueryTypes } = require("sequelize");
+const SendMail = require("../ultils/SendMail");
+const crypto = require('crypto');
+const { QueryTypes, where } = require("sequelize");
 //sequelize raw queries
-const AuthController = {
+const  AuthController = {
   generateAccessToken: (user) => {
+
     return jwt.sign(
       {
         id: user.id,
         isAdmin: user.isAdmin,
       },
       process.env.JWT_ACCESS_KEY,
-      { expiresIn: "5m" }
+      { expiresIn: "2m" }
     );
   },
   generateRefreshToken: (user) => {
@@ -70,7 +73,7 @@ const AuthController = {
           });
           const userData = await db.User.findOne({
             where: { username: username },
-            attributes: ['id', 'username', 'email','phone','address','isAdmin']
+            attributes: ['id', 'username', 'email', 'phone', 'address', 'isAdmin']
           });
           res.status(200).json({ userData, accessToken });
         }
@@ -119,7 +122,7 @@ const AuthController = {
   //   }
   // },
 
-  refresh: async (req, res) => { 
+  refresh: async (req, res) => {
     const cookie = req.cookies;
     const refreshToken = req.cookies.refreshToken;
     console.log('cookie', refreshToken);
@@ -186,24 +189,6 @@ const AuthController = {
     }
   },
   logoutUser: async (req, res) => {
-    // const { refreshToken } = req.body;
-    // try {
-    //   if (!refreshToken) {
-    //     return res.status(400).json({ message: "Refresh token is required" });
-    //   }
-
-    //   const user = await db.User.findOne({
-    //     where: { refreshToken: refreshToken },
-    //   });
-
-    //   if (!user) {
-    //     return res.status(403).json({ message: "Refresh token not valid" });
-    //   }
-
-    //   await db.User.update(
-    //     { refreshToken: null },
-    //     { where: { refreshToken: refreshToken } }
-    //   );
     try {
       const cookie = req.cookies;
       const refreshToken = req.cookies.refreshToken;
@@ -223,6 +208,36 @@ const AuthController = {
       }
     } catch (error) {
       return res.status(500).json({ message: error.message });
+    }
+  },
+  resetPassword: async (req, res) => {
+    const { email } = req.query
+    if (!email) {
+      throw new Error('Email không được để trống');
+    }
+    else {
+      const user = await db.User.findOne({
+        where: { email: email }
+      })
+      if (!user) {
+        throw new Error('Email không hợp lệ') 
+      }
+      else {
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        const passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        const passwordResetExpires = Date.now() + 15 * 60 * 1000;
+        await db.User.update(
+          { passwordResetToken: passwordResetToken, passwordResetExpires: passwordResetExpires },
+          { where: { email: email } }
+        )
+        const html = `Hãy click vào link dưới đây để thay đổi mật khẩu của bạn. Link này sẽ hết hạn sau 15 phút kể từ khi bạn nhận mail này <a href=${process.env.URL_CLIENT}/reset-password/${email}/${resetToken}>Click here!</a>`
+        const data = {
+          email : email,
+          html: html
+        }
+        const response = await SendMail(data);
+        res.status(200).json(response)
+      }
     }
   }
 };

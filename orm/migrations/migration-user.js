@@ -9,14 +9,14 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      username: {
+      username: { 
         type: Sequelize.STRING
       },
       password: {
         type: Sequelize.STRING
       },
       phone:{
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         defaultValue:0
       },
       address:{
@@ -32,6 +32,14 @@ module.exports = {
       },
       refreshToken: {
         type: Sequelize.STRING
+      },
+      passwordResetToken: {
+        type: Sequelize.STRING,
+        defaultValue: null
+      },
+      passwordResetExpires: {
+        type: Sequelize.STRING,
+        defaultValue: null
       },
       createdAt: {
         allowNull: false,
